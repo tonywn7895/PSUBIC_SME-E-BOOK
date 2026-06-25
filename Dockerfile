@@ -10,7 +10,7 @@ RUN apk add --no-cache git unzip libzip-dev \
     && docker-php-ext-install zip
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+RUN composer install --no-dev --no-scripts --prefer-dist --optimize-autoloader --no-interaction
 
 # --- Stage 2: Build Frontend Assets ---
 FROM node:20-alpine AS frontend
