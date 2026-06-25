@@ -10,6 +10,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+# Copy PHP vendor files so Vite can resolve Flux UI resources (e.g. CSS files)
+COPY --from=vendor /app/vendor ./vendor
 RUN npm run build
 
 # --- Stage 3: Final Production Image ---
