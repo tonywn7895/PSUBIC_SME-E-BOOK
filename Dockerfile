@@ -1,6 +1,14 @@
 # --- Stage 1: Build PHP dependencies ---
-FROM composer:2.7 AS vendor
+FROM php:8.4-cli-alpine AS vendor
 WORKDIR /app
+
+# Copy Composer binary from official image
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Install system dependencies required by Composer (zip, git)
+RUN apk add --no-cache git unzip libzip-dev \
+    && docker-php-ext-install zip
+
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
@@ -14,8 +22,9 @@ COPY . .
 COPY --from=vendor /app/vendor ./vendor
 RUN npm run build
 
+
 # --- Stage 3: Final Production Image ---
-FROM serversideup/php:8.3-fpm-nginx
+FROM serversideup/php:8.4-fpm-nginx
 
 # Configure PHP settings via environment variables
 ENV PHP_OPCACHE_ENABLE=1 \
