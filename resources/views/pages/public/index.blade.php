@@ -201,7 +201,7 @@ with(fn () => [
                     <p class="mt-2 text-zinc-500 dark:text-zinc-400">{{ __('ลองดูเอกสารเผยแพร่และตารางสถิติล่าสุดที่แบ่งปันโดยชุมชนของเรา.') }}</p>
                 </div>
                 
-                <div class="flex items-center gap-4">
+                <div class="flex flex-wrap items-center gap-4">
                     {{-- Tab Switcher --}}
                     <div class="flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg shrink-0 border border-zinc-200/50 dark:border-zinc-700/50">
                         <button @click="activeTab = 'ebooks'" 
@@ -377,7 +377,7 @@ with(fn () => [
             <h2 class="text-3xl font-extrabold text-white sm:text-4xl">{{ __('ค้นหาข้อมูลและต่อยอดธุรกิจของคุณ') }}</h2>
             <p class="text-lg text-zinc-300 max-w-xl mx-auto">{{ __('สำรวจสถิติเชิงลึก คู่มือการค้า และตารางวิเคราะห์ความรู้ฟรี โดยไม่ต้องมีขั้นตอนลงทะเบียน.') }}</p>
             
-            <div class="flex items-center justify-center gap-4 pt-4">
+            <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
                 <flux:button :href="route('explore')" variant="primary" icon="magnifying-glass" class="cursor-pointer shadow-lg hover:shadow-indigo-500/20 transition-all">
                     {{ __('ค้นหาในห้องสมุด') }}
                 </flux:button>

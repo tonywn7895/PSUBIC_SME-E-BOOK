@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="overflow-x-hidden">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,7 +12,7 @@
         @fluxAppearance
         @stack('styles')
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-900 font-sans antialiased">
+    <body class="min-h-screen bg-white dark:bg-zinc-900 font-sans antialiased overflow-x-hidden">
         {{-- Public Header --}}
         <header class="sticky top-0 z-40 w-full border-b border-zinc-100 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
