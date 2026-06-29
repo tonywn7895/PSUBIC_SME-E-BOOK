@@ -241,7 +241,7 @@ mount(function (Ebook $ebook) {
                     pdfRatio: 1.41,
                     rendered: new Set(),
                     thumbnailsRendered: new Set(),
-                    pdfUrl: "{{ asset('storage/' . ltrim($ebook->pdf_path, '/')) }}",
+                    pdfUrl: "{{ \Illuminate\Support\Facades\Storage::url($ebook->pdf_path) }}",
                     workerUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
                     observer: null,
                     activeWindowSize: 12,
