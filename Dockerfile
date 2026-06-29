@@ -26,6 +26,11 @@ RUN npm run build
 # --- Stage 3: Final Production Image ---
 FROM serversideup/php:8.4-fpm-nginx
 
+# Switch to root to install GD extension (required by Intervention Image)
+USER root
+RUN install-php-extensions gd
+USER www-data
+
 # Configure PHP settings via environment variables
 ENV PHP_OPCACHE_ENABLE=1 \
     AUTORUN_ENABLED=true \
