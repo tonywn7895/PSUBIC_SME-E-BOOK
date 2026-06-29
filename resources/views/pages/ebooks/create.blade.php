@@ -46,7 +46,7 @@ $save = function () {
     $coverPath = null;
     if ($this->cover) {
         $manager = new ImageManager(new Driver());
-        $image = $manager->decode($this->cover);
+        $image = $manager->decode($this->cover->get());
 
         $image->scale(width: 600);
 
