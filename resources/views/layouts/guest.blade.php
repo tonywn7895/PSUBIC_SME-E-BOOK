@@ -17,11 +17,11 @@
         <header class="sticky top-0 z-40 w-full border-b border-zinc-100 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <a href="{{ route('home') }}" class="flex items-center gap-2" wire:navigate>
-                    <x-app-logo-icon class="size-16" />
+                    <x-app-logo-icon class="size-10 sm:size-12" />
                     <span class="font-bold text-xl text-zinc-900 dark:text-white hidden sm:block">{{ config('app.name') }}</span>
                 </a>
 
-                <nav class="flex items-center gap-4">
+                <nav class="flex items-center gap-2 sm:gap-4">
                     <flux:button :href="route('explore')" variant="ghost" wire:navigate>{{ __('Explore') }}</flux:button>
                     <flux:button :href="route('insights')" variant="ghost" wire:navigate>{{ __('Insights') }}</flux:button>
                     

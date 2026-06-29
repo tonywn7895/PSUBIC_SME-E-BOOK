@@ -88,7 +88,7 @@ with(fn () => [
 
         {{-- Hero Content --}}
         <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="backdrop-blur-lg bg-zinc-950/50 border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl space-y-6">
+            <div class="backdrop-blur-lg bg-zinc-950/50 border border-white/10 rounded-3xl p-6 sm:p-12 shadow-2xl space-y-6">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-indigo-400 bg-indigo-400/10 rounded-full border border-indigo-400/20 uppercase tracking-widest">
                     <flux:icon name="sparkles" variant="micro" />
                     SME Portal
@@ -113,12 +113,12 @@ with(fn () => [
 
     {{-- Stats Bar --}}
     <div class="relative z-20 -mt-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-3 gap-6 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 shadow-xl text-center">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 shadow-xl text-center">
             <div class="space-y-1">
                 <dt class="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{{ __('หนังสือเผยแพร่') }}</dt>
                 <dd class="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white">{{ $stats['ebooks'] }}</dd>
             </div>
-            <div class="space-y-1 border-x border-zinc-100 dark:border-zinc-700">
+            <div class="space-y-1 py-4 sm:py-0 border-y sm:border-y-0 sm:border-x border-zinc-100 dark:border-zinc-700">
                 <dt class="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{{ __('ตารางข้อมูลสาธารณะ') }}</dt>
                 <dd class="text-2xl sm:text-4xl font-bold text-indigo-600 dark:text-indigo-400">{{ $stats['spreadsheets'] }}</dd>
             </div>
