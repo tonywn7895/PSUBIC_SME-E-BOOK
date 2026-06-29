@@ -40,7 +40,7 @@ return [
 
         'public' => [
             'driver' => env('PUBLIC_FILESYSTEM_DRIVER', 'local'),
-            'root' => storage_path('app/public'),
+            'root' => env('PUBLIC_FILESYSTEM_DRIVER', 'local') === 'local' ? storage_path('app/public') : '',
             'url' => env('AWS_URL', rtrim(env('APP_URL', 'http://localhost'), '/').'/storage'),
             'visibility' => 'public',
             'key' => env('AWS_ACCESS_KEY_ID'),
