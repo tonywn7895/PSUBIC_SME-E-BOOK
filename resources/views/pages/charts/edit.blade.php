@@ -13,6 +13,7 @@ state([
     'chart' => null,
     'title' => '',
     'spreadsheet_id' => '',
+    'header_row' => 1,
     'chart_type' => 'bar',
     'x_column' => '',
     'y_column' => '',
@@ -27,6 +28,7 @@ mount(function (Chart $chart) {
     $this->chart = $chart;
     $this->title = $chart->title;
     $this->spreadsheet_id = $chart->spreadsheet_id;
+    $this->header_row = $chart->header_row ?? 1;
     $this->chart_type = $chart->chart_type;
     $this->x_column = $chart->x_column;
     $this->y_column = $chart->y_column;
@@ -35,9 +37,10 @@ mount(function (Chart $chart) {
     $spreadsheet = $chart->spreadsheet;
     if ($spreadsheet) {
         $grid = $spreadsheet->getGridData();
-        if (!empty($grid) && is_array($grid[0])) {
+        $headerIndex = max(0, (int)$this->header_row - 1);
+        if (isset($grid[$headerIndex]) && is_array($grid[$headerIndex])) {
             $this->headers = [];
-            foreach ($grid[0] as $index => $colName) {
+            foreach ($grid[$headerIndex] as $index => $colName) {
                 $name = trim((string)$colName);
                 if ($name === '') {
                     $name = "Column " . ($index + 1);
@@ -54,21 +57,23 @@ with(fn () => [
     'spreadsheets' => Spreadsheet::query()->latest()->get(),
 ]);
 
-$updatedSpreadsheetId = function ($value) {
-    if (empty($value)) {
+$parseHeaders = function () {
+    if (empty($this->spreadsheet_id)) {
         $this->headers = [];
         $this->x_column = '';
         $this->y_column = '';
         $this->previewData = null;
         return;
     }
-
-    $spreadsheet = Spreadsheet::find($value);
+    
+    $spreadsheet = Spreadsheet::find($this->spreadsheet_id);
     if ($spreadsheet) {
         $grid = $spreadsheet->getGridData();
-        if (!empty($grid) && is_array($grid[0])) {
+        $headerIndex = max(0, (int)$this->header_row - 1);
+        
+        if (isset($grid[$headerIndex]) && is_array($grid[$headerIndex])) {
             $this->headers = [];
-            foreach ($grid[0] as $index => $colName) {
+            foreach ($grid[$headerIndex] as $index => $colName) {
                 $name = trim((string)$colName);
                 if ($name === '') {
                     $name = "Column " . ($index + 1);
@@ -81,13 +86,44 @@ $updatedSpreadsheetId = function ($value) {
     } else {
         $this->headers = [];
     }
+    
     $this->x_column = '';
     $this->y_column = '';
     $this->previewData = null;
 };
 
+$updatedSpreadsheetId = function ($value) {
+    if (empty($value)) {
+        $this->parseHeaders();
+        return;
+    }
+
+    $spreadsheet = Spreadsheet::find($value);
+    if ($spreadsheet) {
+        $grid = $spreadsheet->getGridData();
+        // Auto-detect header row
+        $bestRow = 0;
+        $maxCols = 0;
+        $scanLimit = min(10, count($grid));
+        for ($i = 0; $i < $scanLimit; $i++) {
+            $nonEmptyCount = count(array_filter($grid[$i], fn($cell) => trim((string)$cell) !== ''));
+            if ($nonEmptyCount > $maxCols) {
+                $maxCols = $nonEmptyCount;
+                $bestRow = $i;
+            }
+        }
+        $this->header_row = $bestRow + 1;
+    }
+    
+    $this->parseHeaders();
+};
+
+$updatedHeaderRow = function () {
+    $this->parseHeaders();
+};
+
 $updated = function ($property) {
-    if (in_array($property, ['spreadsheet_id', 'x_column', 'y_column', 'chart_type'])) {
+    if (in_array($property, ['spreadsheet_id', 'header_row', 'x_column', 'y_column', 'chart_type'])) {
         $this->previewData = $this->calculatePreviewData();
     }
 };
@@ -95,6 +131,7 @@ $updated = function ($property) {
 rules([
     'title' => ['required', 'string', 'max:255'],
     'spreadsheet_id' => ['required', 'exists:spreadsheets,id'],
+    'header_row' => ['required', 'integer', 'min:1'],
     'chart_type' => ['required', 'in:bar,line,pie'],
     'x_column' => ['required', 'string'],
     'y_column' => ['required', 'string'],
@@ -107,9 +144,11 @@ $save = function () {
     $spreadsheet = Spreadsheet::find($this->spreadsheet_id);
     if ($spreadsheet) {
         $grid = $spreadsheet->getGridData();
+        $headerIndex = max(0, (int)$this->header_row - 1);
         $yIdx = (int)$this->y_column;
         $hasNumeric = false;
-        for ($i = 1; $i < count($grid); $i++) {
+        
+        for ($i = $headerIndex + 1; $i < count($grid); $i++) {
             $val = $grid[$i][$yIdx] ?? '';
             $cleanVal = trim(str_replace(',', '', (string)$val));
             if ($cleanVal !== '') {
@@ -128,6 +167,7 @@ $save = function () {
 
     $this->chart->update([
         'spreadsheet_id' => $this->spreadsheet_id,
+        'header_row' => $this->header_row,
         'title' => $this->title,
         'chart_type' => $this->chart_type,
         'x_column' => $this->x_column,
@@ -150,7 +190,8 @@ $calculatePreviewData = function () {
     }
 
     $grid = $spreadsheet->getGridData();
-    if (count($grid) <= 1) {
+    $headerIndex = max(0, (int)$this->header_row - 1);
+    if (count($grid) <= $headerIndex + 1) {
         return null;
     }
 
@@ -158,7 +199,7 @@ $calculatePreviewData = function () {
 
     $hasNonNumeric = false;
     $nonNumericValue = null;
-    for ($i = 1; $i < count($grid); $i++) {
+    for ($i = $headerIndex + 1; $i < count($grid); $i++) {
         $val = $grid[$i][$yIdx] ?? '';
         $cleanVal = trim(str_replace(',', '', (string)$val));
         if ($cleanVal !== '' && !is_numeric($cleanVal)) {
@@ -176,6 +217,7 @@ $calculatePreviewData = function () {
 
     $tempChart = new Chart([
         'spreadsheet_id' => $this->spreadsheet_id,
+        'header_row' => $this->header_row,
         'x_column' => $this->x_column,
         'y_column' => $this->y_column,
     ]);
@@ -186,7 +228,6 @@ $calculatePreviewData = function () {
         return ['error' => $e->getMessage()];
     }
 };
-
 ?>
 
 <div class="max-w-4xl mx-auto space-y-6">
@@ -203,6 +244,10 @@ $calculatePreviewData = function () {
                         <flux:select.option :value="$s->id">{{ $s->title }}</flux:select.option>
                     @endforeach
                 </flux:select>
+
+                @if(!empty($spreadsheet_id))
+                    <flux:input type="number" min="1" wire:model.live="header_row" :label="__('Header Row (1-indexed)')" required :description="__('The row number in the spreadsheet that contains column names.')" />
+                @endif
 
                 @if (!empty($headers))
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -14,6 +14,7 @@ class Chart extends Model
 
     protected $fillable = [
         'spreadsheet_id',
+        'header_row',
         'title',
         'chart_type',
         'x_column',
@@ -22,6 +23,7 @@ class Chart extends Model
     ];
 
     protected $casts = [
+        'header_row' => 'integer',
         'is_public' => 'boolean',
     ];
 
@@ -55,11 +57,13 @@ class Chart extends Model
         }
 
         $grid = $spreadsheet->getGridData();
-        if (count($grid) <= 1) {
+        $headerIndex = max(0, (int) $this->header_row - 1);
+
+        if (count($grid) <= $headerIndex + 1) {
             return ['labels' => [], 'values' => []];
         }
 
-        $headerRow = $grid[0];
+        $headerRow = $grid[$headerIndex];
 
         $xIdx = is_numeric($this->x_column) ? (int)$this->x_column : array_search($this->x_column, $headerRow);
         $yIdx = is_numeric($this->y_column) ? (int)$this->y_column : array_search($this->y_column, $headerRow);
@@ -71,7 +75,7 @@ class Chart extends Model
         $labels = [];
         $values = [];
 
-        for ($i = 1; $i < count($grid); $i++) {
+        for ($i = $headerIndex + 1; $i < count($grid); $i++) {
             $row = $grid[$i];
 
             $labelVal = $row[$xIdx] ?? '';
